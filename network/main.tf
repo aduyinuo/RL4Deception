@@ -197,3 +197,10 @@ output "public_web1_ip" {
 output "public_web2_ip" {
   value = aws_instance.nodes["PublicWeb2"].public_ip
 } 
+
+output "all_private_ips" {
+  value = {
+    for name, inst in aws_instance.nodes :
+    name => inst.private_ip
+  }
+}
