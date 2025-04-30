@@ -42,3 +42,18 @@ IP Address      Status
 10.0.3.136      ✅
 10.0.3.67       ✅
 ```
+
+- verify the existence of CVE-2023-6553 on PublicWeb1
+
+```
+ssh -i ~/RL4Deception.pem ubuntu@10.0.1.204
+ls -l /var/www/html/wp-content/plugins/
+grep -i version /var/www/html/wp-content/plugins/backup-backup/backup-backup.php
+```
+
+```
+   *     Version: 1.3.7
+  if (!defined('BMI_VERSION')) {
+    define('BMI_VERSION', '1.3.7');
+```
+

@@ -1,4 +1,4 @@
-- [ ] Inject vulnerabilities
+- [x] Inject vulnerabilities
 - [ ] Verify individual vulnerabilities
 - [ ] Automate attacker script
 - [ ] C2 testing
