@@ -1,0 +1,37 @@
+from flask import Flask, request, render_template_string, render_template
+import re
+
+app = Flask(__name__)
+
+# Define blocklist keywords and regex for file paths
+BLOCKLIST_KEYWORDS = ['os', 'eval', 'exec', 'bind', 'connect', 'python','python3', 'socket', 'ls', 'cat', 'shell', 'bind']
+FILE_PATH_REGEX = r'0x[0-9A-Fa-f]+|\\u[0-9A-Fa-f]{4}|%[0-9A-Fa-f]{2}|\.[A-Za-z0-9]{1,3}\b|[\\\/]|\.\.'
+
+
+@app.route('/')
+def index():
+    return render_template('index.html/')
+
+@app.route('/execute', methods=['POST'])
+def execute():
+    code = request.form['code']
+
+    # Check for blocklist keywords in submitted code
+    for keyword in BLOCKLIST_KEYWORDS:
+        if keyword in code:
+            return render_template('error.html', keyword=keyword)
+
+    # Check for file path using regex
+    if re.search(FILE_PATH_REGEX, code):
+        return render_template('error.html')
+
+    try:
+        # Execute the Python code if no blocklist keyword or file path found
+        result = eval(code)
+    except Exception as e:
+        result = f"Error: {str(e)}"
+
+    return render_template('result.html', result=result)
+
+if __name__ == '__main__':
+    app.run(debug=True, host="0.0.0.0", port=5000)
